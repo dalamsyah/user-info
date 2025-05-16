@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'profile_photo',
+        'bio',
+        'phone',
     ];
 
     /**
@@ -45,4 +49,18 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function getProfilePhotoUrlAttribute()
+    {
+        if ($this->profile_photo) {
+            return url('storage/' . $this->profile_photo);
+        }
+        
+        return null;
+    }
+
+    protected $appends = [
+        'profile_photo_url',
+    ];
+
 }
