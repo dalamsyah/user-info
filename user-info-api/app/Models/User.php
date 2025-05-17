@@ -37,25 +37,20 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'favorite_foods' => 'array',
+        'hobbies' => 'array',
+        'social_media_links' => 'array',
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
 
     public function getProfilePhotoUrlAttribute()
     {
         if ($this->profile_photo) {
             return url('storage/' . $this->profile_photo);
         }
-        
+
         return null;
     }
 
