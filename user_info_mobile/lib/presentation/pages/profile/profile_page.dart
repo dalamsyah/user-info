@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:user_info_mobile/core/util/compress_image.dart';
+import 'package:user_info_mobile/core/util/crop_image.dart';
 import 'package:user_info_mobile/domain/entities/user.dart';
 import 'package:user_info_mobile/presentation/bloc/profile/profile_bloc.dart';
 import 'package:user_info_mobile/presentation/bloc/profile/profile_event.dart';
@@ -89,18 +90,55 @@ class _ProfilePageState extends State<ProfilePage> {
     _socialMediaLinks = user.socialMediaLinks ?? [];
   }
 
-  Future<void> _pickImage() async {
+  Future<void> _showImageSourceActionSheet() async {
+    final action = await showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Gallery'),
+                onTap: () {
+                  Navigator.pop(context, 'gallery');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_camera),
+                title: const Text('Camera'),
+                onTap: () {
+                  Navigator.pop(context, 'camera');
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (action == null) return;
+
     final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    final XFile? image = await picker.pickImage(
+      source: action == 'camera' ? ImageSource.camera : ImageSource.gallery,
+      imageQuality: 80,
+    );
 
     if (image != null) {
       File imageFile = File(image.path);
 
-      File compressedFile = await compressImage(imageFile);
+      // ignore: use_build_context_synchronously
+      File? croppedFile = await cropImage(imageFile, context);
 
-      setState(() {
-        _profilePhoto = compressedFile;
-      });
+      if (croppedFile != null) {
+        File compressedFile = await compressImage(croppedFile);
+
+        setState(() {
+          _profilePhoto = compressedFile;
+        });
+      }
     }
   }
 
@@ -256,7 +294,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   radius: 20,
                   child: IconButton(
                     icon: const Icon(Icons.camera_alt, color: Colors.white),
-                    onPressed: _pickImage,
+                    onPressed: () => _showImageSourceActionSheet(),
                   ),
                 ),
               ),
