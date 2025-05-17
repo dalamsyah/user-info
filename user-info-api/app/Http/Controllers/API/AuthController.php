@@ -53,7 +53,7 @@ class AuthController extends Controller
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'status' => false,
                 'message' => 'An error occurred during registration',
@@ -102,7 +102,7 @@ class AuthController extends Controller
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'status' => false,
                 'message' => 'An error occurred during login',
@@ -115,7 +115,7 @@ class AuthController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'email' => 'required|email',
+                'email' => 'required|email|exists:users,email',
             ]);
 
             if ($validator->fails()) {
@@ -126,32 +126,28 @@ class AuthController extends Controller
                 ], 422);
             }
 
-            $status = Password::sendResetLink(
-                $request->only('email')
-            );
+            $user = User::where('email', $request->email)->first();
 
-            if ($status === Password::RESET_LINK_SENT) {
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Password reset link sent to your email'
-                ]);
-            }
+            // Generate password baru
+            $newPassword = Str::random(10);
+
+            // Simpan password baru (dihash)
+            $user->password = Hash::make($newPassword);
+            $user->save();
+
+            // Kirim ke email
+            $user->notify(new \App\Notifications\SendNewPasswordNotification($newPassword));
 
             return response()->json([
-                'status' => false,
-                'message' => 'Could not send reset link',
-                'error' => __($status)
-            ], 400);
-        } catch (Exception $e) {
-            Log::error('Forgot password error: ' . $e->getMessage(), [
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
+                'status' => true,
+                'message' => 'A new password has been sent to your email address.'
             ]);
-            
+        } catch (Exception $e) {
+            Log::error('Forgot password error: ' . $e->getMessage());
+
             return response()->json([
                 'status' => false,
-                'message' => 'An error occurred while processing forgot password request',
+                'message' => 'Failed to process forgot password',
                 'error' => config('app.debug') ? $e->getMessage() : 'Server error'
             ], 500);
         }
@@ -214,7 +210,7 @@ class AuthController extends Controller
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'status' => false,
                 'message' => 'An error occurred during password reset',
@@ -238,7 +234,7 @@ class AuthController extends Controller
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'status' => false,
                 'message' => 'An error occurred during logout',
