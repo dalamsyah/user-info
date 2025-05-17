@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:user_info_mobile/domain/entities/user.dart';
 import 'package:user_info_mobile/presentation/bloc/profile/profile_bloc.dart';
 import 'package:user_info_mobile/presentation/bloc/profile/profile_event.dart';
@@ -146,17 +145,17 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  void _addSocialMediaLink(String platform, String link) {
-    if (platform.isNotEmpty && link.isNotEmpty) {
+  void _addSocialMediaLink(String link) {
+    if (link.isNotEmpty) {
       setState(() {
         _socialMediaLinks.add(link);
       });
     }
   }
 
-  void _removeSocialMediaLink(String platform) {
+  void _removeSocialMediaLink(String link) {
     setState(() {
-      _socialMediaLinks.remove(platform);
+      _socialMediaLinks.remove(link);
     });
   }
 
@@ -525,7 +524,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
           // Social Media Links
           _buildSectionHeader('Social Media Links'),
-          _buildSocialMediaInputs(),
+          _buildChipInputField(
+            hint: 'Add Social Media Links',
+            icon: Icons.web,
+            items: _socialMediaLinks,
+            onAdd: _addSocialMediaLink,
+            onRemove: _removeSocialMediaLink,
+          ),
           const SizedBox(height: 16),
 
           // Website
@@ -651,121 +656,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildSocialMediaInputs() {
-    final socialMediaPlatforms = [
-      'Facebook',
-      'Twitter',
-      'Instagram',
-      'LinkedIn',
-      'TikTok',
-      'YouTube',
-    ];
-    final TextEditingController platformController = TextEditingController();
-    final TextEditingController linkController = TextEditingController();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              flex: 5,
-              child: DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  labelText: 'Platform',
-                  hintText: 'Platform',
-                  prefixIcon: Icon(Icons.link),
-                ),
-                items:
-                    socialMediaPlatforms
-                        .map(
-                          (platform) => DropdownMenuItem(
-                            value: platform,
-                            child: Text(platform),
-                          ),
-                        )
-                        .toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    platformController.text = value;
-                  }
-                },
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              flex: 5,
-              child: TextField(
-                controller: linkController,
-                decoration: const InputDecoration(labelText: 'Profile URL'),
-              ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.add_circle),
-              color: Theme.of(context).primaryColor,
-              onPressed: () {
-                if (platformController.text.isNotEmpty &&
-                    linkController.text.isNotEmpty) {
-                  _addSocialMediaLink(
-                    platformController.text,
-                    linkController.text,
-                  );
-                  platformController.clear();
-                  linkController.clear();
-                }
-              },
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Column(
-          children:
-              _socialMediaLinks.map((link) {
-                final platform = _getPlatformFromLink(
-                  link,
-                ); // fungsi untuk ambil nama platform
-                return ListTile(
-                  leading: Icon(_getSocialMediaIcon(platform)),
-                  title: Text(platform),
-                  subtitle: Text(link),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () => _removeSocialMediaLink(link),
-                  ),
-                );
-              }).toList(),
-        ),
-      ],
-    );
-  }
-
-  String _getPlatformFromLink(String link) {
-    if (link.contains("instagram.com")) return "Instagram";
-    if (link.contains("twitter.com")) return "Twitter";
-    if (link.contains("facebook.com")) return "Facebook";
-    // Tambahkan platform lain sesuai kebutuhan
-    return "Unknown";
-  }
-
-  IconData _getSocialMediaIcon(String platform) {
-    switch (platform.toLowerCase()) {
-      case 'facebook':
-        return Icons.facebook;
-      case 'twitter':
-        return Icons.whatshot;
-      case 'instagram':
-        return Icons.camera_alt;
-      case 'linkedin':
-        return Icons.work;
-      case 'tiktok':
-        return Icons.music_video;
-      case 'youtube':
-        return Icons.play_circle_filled;
-      default:
-        return Icons.link;
-    }
-  }
-
   Widget _buildProfileInfo(User user) {
     return ListView(
       padding: EdgeInsets.zero,
@@ -834,31 +724,21 @@ class _ProfilePageState extends State<ProfilePage> {
         if (user.socialMediaLinks != null &&
             user.socialMediaLinks!.isNotEmpty) ...[
           _buildSectionHeader('Social Media'),
-          ...user.socialMediaLinks!.map((link) {
-            final platform = _getPlatformFromLink(link);
-            return ListTile(
-              leading: Icon(_getSocialMediaIcon(platform)),
-              title: Text(platform),
-              subtitle: Text(link),
-              onTap: () => _launchURL(link),
-            );
-          }),
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children:
+                user.socialMediaLinks!.map((food) {
+                  return Chip(
+                    label: Text(food),
+                    backgroundColor: Colors.green.shade100,
+                  );
+                }).toList(),
+          ),
           const SizedBox(height: 16),
         ],
       ],
     );
-  }
-
-  void _launchURL(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      ScaffoldMessenger.of(
-        // ignore: use_build_context_synchronously
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Could not launch URL')));
-    }
   }
 
   Widget _buildInfoTile(IconData icon, String title, String value) {

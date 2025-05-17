@@ -321,12 +321,12 @@ class UserDetailsPageState extends State<UserDetailsPage> {
     return "Unknown";
   }
 
-  IconData _getSocialMediaIcon(String platform) {
-    switch (platform.toLowerCase()) {
+  IconData _getSocialMediaIcon(String link) {
+    switch (link.toLowerCase()) {
       case 'facebook':
         return Icons.facebook;
       case 'twitter':
-        return Icons.alternate_email; // Ganti jika ada icon khusus
+        return Icons.alternate_email;
       case 'instagram':
         return Icons.camera_alt_outlined;
       case 'linkedin':
