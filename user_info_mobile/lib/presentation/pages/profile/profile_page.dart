@@ -784,6 +784,7 @@ class _ProfilePageState extends State<ProfilePage> {
               const SnackBar(content: Text('Profile updated successfully')),
             );
             _loadUserData(state.user);
+            context.read<ProfileBloc>().add(GetProfileRequested());
           } else if (state is ProfileFailure) {
             ScaffoldMessenger.of(
               context,
