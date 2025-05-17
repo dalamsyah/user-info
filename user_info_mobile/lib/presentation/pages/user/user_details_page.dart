@@ -306,7 +306,7 @@ class UserDetailsPageState extends State<UserDetailsPage> {
                 platform,
                 link,
                 icon,
-                onTap: () => _launchURL(link),
+                onTap: () => _launchUrl(link),
               );
             }).toList(),
       ),
@@ -333,21 +333,6 @@ class UserDetailsPageState extends State<UserDetailsPage> {
         return Icons.business_center_outlined;
       default:
         return Icons.link;
-    }
-  }
-
-  void _launchURL(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Could not launch $url'),
-          backgroundColor: Colors.red,
-        ),
-      );
     }
   }
 
@@ -383,7 +368,7 @@ class UserDetailsPageState extends State<UserDetailsPage> {
 
   void _launchUri(Uri uri) async {
     if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
+      await launchUrl(uri, mode: LaunchMode.platformDefault);
     } else {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
