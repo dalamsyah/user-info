@@ -1,6 +1,6 @@
 # User Information System
 
-[![Download APK](https://img.shields.io/badge/Download-APK-brightgreen)](user-info.apk)
+[![Download APK](https://img.shields.io/badge/Download-APK-brightgreen)](app-release.apk)
 
 There are two projects in this repository:
 1. **user-info-api** - Backend API built with Laravel 12
