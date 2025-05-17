@@ -39,8 +39,8 @@ class UserModel extends User {
           json['favorite_foods'] != null
               ? List<String>.from(json['favorite_foods'])
               : null,
-      height: json['height'],
-      weight: json['weight'],
+      height: int.tryParse(json['height']?.toString() ?? ''),
+      weight: int.tryParse(json['weight']?.toString() ?? ''),
       bmi: json['bmi'],
       birthdate: json['birthdate'],
       occupation: json['occupation'],
