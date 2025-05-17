@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:user_info_mobile/presentation/pages/auth/login_page.dart';
+import 'package:user_info_mobile/auth_checker_page.dart';
 import 'di_container.dart' as di;
 import 'presentation/bloc/auth/auth_bloc.dart';
 import 'presentation/bloc/profile/profile_bloc.dart';
@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
           fontFamily: 'Poppins',
           useMaterial3: true,
         ),
-        home: LoginPage(),
+        home: AuthCheckerPage(),
         routes: AppRoutes.routes,
       ),
     );
