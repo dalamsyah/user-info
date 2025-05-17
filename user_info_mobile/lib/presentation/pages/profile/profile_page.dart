@@ -854,8 +854,8 @@ class _ProfilePageState extends State<ProfilePage> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(
+        // ignore: use_build_context_synchronously
         context,
       ).showSnackBar(const SnackBar(content: Text('Could not launch URL')));
     }
