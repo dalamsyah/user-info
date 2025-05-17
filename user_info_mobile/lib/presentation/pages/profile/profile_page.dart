@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:user_info_mobile/core/util/compress_image.dart';
 import 'package:user_info_mobile/domain/entities/user.dart';
 import 'package:user_info_mobile/presentation/bloc/profile/profile_bloc.dart';
 import 'package:user_info_mobile/presentation/bloc/profile/profile_event.dart';
@@ -93,8 +94,12 @@ class _ProfilePageState extends State<ProfilePage> {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
+      File imageFile = File(image.path);
+
+      File compressedFile = await compressImage(imageFile);
+
       setState(() {
-        _profilePhoto = File(image.path);
+        _profilePhoto = compressedFile;
       });
     }
   }
