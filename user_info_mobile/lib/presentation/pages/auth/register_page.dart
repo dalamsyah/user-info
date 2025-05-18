@@ -57,6 +57,7 @@ class RegisterPageState extends State<RegisterPage> {
               ),
             );
           } else if (state is AuthAuthenticated) {
+            Navigator.of(context).pop();
             Navigator.pushReplacementNamed(context, AppRoutes.home);
           }
         },
