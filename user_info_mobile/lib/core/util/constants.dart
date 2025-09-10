@@ -8,7 +8,8 @@ import 'package:user_info_mobile/presentation/pages/user/user_details_page.dart'
 import 'package:user_info_mobile/presentation/pages/user/users_list_page.dart';
 
 class ApiConstants {
-  static const String baseUrl = 'https://user-info.daringversity.com/api';
+  // static const String baseUrl = 'https://user-info.daringversity.com/api';
+  static const String baseUrl = 'http://10.0.2.2:8000/api';
 
   // Auth endpoints
   static const String register = '/register';
